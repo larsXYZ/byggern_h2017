@@ -18,6 +18,8 @@ local_drivers\hardware\ADC_driver.c
 
 local_drivers\hardware\ext_mem_driver.c
 
+local_drivers\hardware\music.c
+
 local_drivers\hardware\oled_driver.c
 
 local_drivers\main.c

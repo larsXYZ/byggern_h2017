@@ -33,6 +33,7 @@ int main(void)
 	//Enables interrupts
 	sei();
 	
+	
 	printf("start\n");
 	long int i = 0;
 	int a = 0;
@@ -56,4 +57,5 @@ int main(void)
 			
 		}
 	}
+	
 }

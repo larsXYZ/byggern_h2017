@@ -49,6 +49,7 @@ C_SRCS +=  \
 ../local_drivers/app/option_functions.c \
 ../local_drivers/hardware/ADC_driver.c \
 ../local_drivers/hardware/ext_mem_driver.c \
+../local_drivers/hardware/music.c \
 ../local_drivers/hardware/oled_driver.c \
 ../local_drivers/main.c \
 ../local_drivers/menu/menu_object.c
@@ -69,6 +70,7 @@ local_drivers/app/App.o \
 local_drivers/app/option_functions.o \
 local_drivers/hardware/ADC_driver.o \
 local_drivers/hardware/ext_mem_driver.o \
+local_drivers/hardware/music.o \
 local_drivers/hardware/oled_driver.o \
 local_drivers/main.o \
 local_drivers/menu/menu_object.o
@@ -82,6 +84,7 @@ local_drivers/app/App.o \
 local_drivers/app/option_functions.o \
 local_drivers/hardware/ADC_driver.o \
 local_drivers/hardware/ext_mem_driver.o \
+local_drivers/hardware/music.o \
 local_drivers/hardware/oled_driver.o \
 local_drivers/main.o \
 local_drivers/menu/menu_object.o
@@ -95,6 +98,7 @@ local_drivers/app/App.d \
 local_drivers/app/option_functions.d \
 local_drivers/hardware/ADC_driver.d \
 local_drivers/hardware/ext_mem_driver.d \
+local_drivers/hardware/music.d \
 local_drivers/hardware/oled_driver.d \
 local_drivers/main.d \
 local_drivers/menu/menu_object.d
@@ -108,6 +112,7 @@ local_drivers/app/App.d \
 local_drivers/app/option_functions.d \
 local_drivers/hardware/ADC_driver.d \
 local_drivers/hardware/ext_mem_driver.d \
+local_drivers/hardware/music.d \
 local_drivers/hardware/oled_driver.d \
 local_drivers/main.d \
 local_drivers/menu/menu_object.d
@@ -176,6 +181,13 @@ local_drivers/hardware/ADC_driver.o: ../local_drivers/hardware/ADC_driver.c
 	
 
 local_drivers/hardware/ext_mem_driver.o: ../local_drivers/hardware/ext_mem_driver.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"../local_drivers/app" -I"../local_drivers/hardware" -I"../local_drivers/menu" -I"../../../drivers"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+local_drivers/hardware/music.o: ../local_drivers/hardware/music.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"../local_drivers/app" -I"../local_drivers/hardware" -I"../local_drivers/menu" -I"../../../drivers"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

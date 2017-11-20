@@ -3,6 +3,7 @@
 #include "oled_driver.h"
 #include "f_cpu.h"
 #include "ADC_driver.h"
+#include "music.h"
 
 #include <util/delay.h>
 
@@ -41,6 +42,7 @@ void app_init()
 	UART_init(9600);
 	oled_init();
 	adc_init();
+	music_init();
 	
 	//Shows logo
 	app_logo();
@@ -87,6 +89,9 @@ void app_setup()
 	opt_select_name(); 
 	opt_select_difficulty();
 	opt_select_music(); 
+	
+	_delay_ms(5000);
+	music_start_up_sound();
 	
 	//Printing menus
 	while (!EXIT_APPLICATION)

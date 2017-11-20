@@ -18,6 +18,7 @@
 #define ID_INPUT_UPDATE 1	//Should me message of length 3 [x_pos, y_pos, joystick_button]
 #define ID_REGULATOR_KP 2	//Should be message of length 2 with the KP parameter, 1 -> higher bits, 2 -> lower bits
 #define ID_REGULATOR_KI 3	//Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
+#define ID_RETURN_IR_SENSOR_TRIGGERED 4
 
 
 struct can_frame

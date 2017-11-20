@@ -1,8 +1,12 @@
 #include "App.h"
 
+#include "music.h"
+#include "f_cpu.h"
+#include <util/delay.h>
+
 
 int main(void)
-{ 
+{ /*
 	app_init(); //Initializes game
 	
 	
@@ -13,6 +17,19 @@ int main(void)
 	//	if (!app_endscreen()) break; //Shows score asks if player wants to replay
 
 	//app_goodbye_message(); //Thanks player for playing
+	*/
+
+	music_init();
+	
+	while (1)
+	{
+		music_next_song();
+		_delay_ms(10000);
+		music_prev_song();
+		_delay_ms(10000);
+	}
+	
+ 	
 	
 	return 0;
 }
