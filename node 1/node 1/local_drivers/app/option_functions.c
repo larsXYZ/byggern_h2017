@@ -6,6 +6,8 @@
 #include "menu_object.h"
 #include <util\delay.h>
 
+
+
 void opt_select_name()
 {
 	//Sets up screen for functions
@@ -203,22 +205,19 @@ void view_highscore()
 
 void opt_start_game()
 {
-	char current_score[10] = "0";  // shall increase more and more as long as the game is ongoing
-	//if(atoi(current_score) > 25) atoi transform a cstring og integers to its number
+	char current_score[10] = "0";  
 	int back_to_menu = 0;
-	
-	
-	
+	EXIT_APPLICATION = 0; 
+
 	oled_clear_SRAM();
 	oled_home(); 
 	oled_cstring_write("The game has started", 1);
 	oled_update_from_SRAM();
 	
-	
 	while (!back_to_menu) // game loop
 	{
 		adc_update_current_input();
-		if(joystick_left()) 
+		if(joystick_left()) //checks if player want to leave game 
 		{
 			oled_clear_SRAM();
 			oled_home();
@@ -228,8 +227,6 @@ void opt_start_game()
 			oled_go_to(0,4);
 			oled_cstring_write("joytick right = no",1);
 			oled_update_from_SRAM();
-			
-			
 			while(1)
 			{
 				adc_update_current_input();
@@ -243,11 +240,8 @@ void opt_start_game()
 					oled_clear_SRAM();
 					break; 
 					
-				}
-				
-				
+				}	
 			}
-			
 		}
 		
 	    //prints current score 
@@ -259,8 +253,44 @@ void opt_start_game()
 		oled_cstring_write(current_score ,1);
 		oled_update_from_SRAM();
 		
-		
-		
+		//Lost the game?  
+		CAN_handle_message();//see if the player lost 
+		if(EXIT_APPLICATION)
+		{
+			oled_clear_SRAM();
+			oled_home();
+			oled_cstring_write("You lost", 1);
+			oled_go_to(0,3);
+			oled_cstring_write("joytick left = play Again",1);
+			oled_go_to(0,4);
+			oled_cstring_write("joytick right = Leave to main menu",1);
+			oled_update_from_SRAM();
+			while(1)
+			{
+				
+			
+				adc_update_current_input();
+				if(joystick_left())
+				{
+					back_to_menu = 1;
+					break;
+				}
+				if(joystick_right())
+				{
+					current_score[10] = "0"; 
+					EXIT_APPLICATION = 0;
+				
+
+					oled_clear_SRAM();
+					oled_home();
+					oled_cstring_write("The game has started", 1);
+					oled_update_from_SRAM();
+						
+			}
+			}
+			
+			
+		}
 		
 	}
 	
@@ -272,6 +302,7 @@ void opt_exit_application()
 	EXIT_APPLICATION = 1; 
 	
 }
+
 
 	
 	

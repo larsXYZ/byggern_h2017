@@ -39,7 +39,7 @@ void opt_exit_application();  // exits the application
 /* Utility function */
 char* int_to_cstring(int t);
 
-
+void the_end(); 
 
 
 #endif

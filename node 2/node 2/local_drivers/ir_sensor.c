@@ -34,14 +34,17 @@ void ir_detect_ball()
 		number_detections++;
 		cycles_since_detection = 0;
 		filter_enable = 1;
+		CAN_send_parameter(4,1); // Sends to node 1, that the ir sensor is triggered
+		printf("aidddddddddddddddds\n");
 	}
 	
 	//Update voltage history
 	value_history = voltage;
-	
+	//printf("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiv");
+	CAN_send_parameter(4,1);
 	//Update filter-cycle counter
 	cycles_since_detection++;
-	
 	//If enough time has passed, allow detection
 	if (cycles_since_detection > IR_DETECTION_DELAY) filter_enable = 0;
 }
+

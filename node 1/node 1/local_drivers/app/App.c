@@ -36,6 +36,13 @@ char HIGHSCORE_LIST_NAMES[10][4] = {"LAR","PER","XXX","AKS","HEN","CHR","   "," 
 int EXIT_APPLICATION = 0;
 
 
+
+
+void the_end()
+{
+	EXIT_APPLICATION = 1;
+}
+
 void app_init()
 {
 	//Initialize drivers
@@ -45,6 +52,7 @@ void app_init()
 	music_init();
 	
 	//Shows logo
+	music_start_up_sound();
 	app_logo();
 	
 	//Creating menus
@@ -90,16 +98,12 @@ void app_setup()
 	opt_select_difficulty();
 	opt_select_music(); 
 	
-	_delay_ms(5000);
-	music_start_up_sound();
-	
 	//Printing menus
 	while (!EXIT_APPLICATION)
 	{
-		
+		adc_update_current_input();
 		menu_control(&main_menu);
 		oled_update_from_SRAM();
-		adc_update_current_input();
 	}
 
 }
@@ -117,7 +121,6 @@ void app_run()
 	
 	//thanks player for playing
 	oled_clear_SRAM();
-	oled_update_from_SRAM();
 	oled_home(); 
 	oled_cstring_write("Thank u for playing", 1);
 	oled_update_from_SRAM();

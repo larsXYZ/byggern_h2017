@@ -6,7 +6,6 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-
 //PIN DEFINITIONS
 #define EN PH4
 #define RST_ PH6
@@ -14,6 +13,10 @@
 #define SEL PH3
 #define DIR PH1
 #define SOL_PIN PA0
+
+//Regulator tuning
+float KP = 7.5;
+float KI = 0.4;
 
 void ctrl_init()
 {
@@ -136,3 +139,7 @@ void ctrl_fire_sol()
 	PORTA |= (1 << SOL_PIN);
 	
 }
+
+void ctrl_update_KP(float p){ KP = p; }
+
+void ctrl_update_KI(float p){ KI = p; }

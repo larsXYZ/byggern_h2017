@@ -1,6 +1,6 @@
 #include "CAN.h"
 #ifdef __AVR_ATmega2560__
-#include "../node\ 2/local_drivers/motor_control.h"				//WHY DOESNT THIS WORK?
+#include "../node 2/node 2/local_drivers/motor_control.h"
 #endif
 
 #include <stdio.h>
@@ -72,9 +72,6 @@ void CAN_send_frame(struct can_frame* message)
 
 int CAN_int_vector()
 {
-
-	//Reset interrupt flag, in order to allow a new message to be received into the buffer
-	
 	//Tell rest of the program we have mail
 	message_received = 1;
 	
@@ -164,17 +161,23 @@ void CAN_handle_message()
 		{
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
-			KP = data / 1000.0;
+			ctrl_update_KP(data / 1000.0);
 			break;
 		}
 		case (ID_REGULATOR_KI): //MESSAGE IS UPDATE TO KP PARAMETER, //Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
 		{
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
-			KI = data / 1000.0;
+			ctrl_update_KP(data / 1000.0);
 			break;
 		}
-		
+		case(ID_RETURN_IR_SENSOR_TRIGGERED):
+		{
+			printf("HHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEL");
+			the_end(); 
+			
+			break; 
+		}
 	}
 	#endif
 }

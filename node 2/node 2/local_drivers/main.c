@@ -14,9 +14,10 @@
 
 int main(void)
 {
-	
 	//Initialises UART communication
 	UART_init(9600);
+	
+	printf("start\n");
 	
 	//CAN startup
 	CAN_init(CAN_MODE_NORMAL);
@@ -33,16 +34,24 @@ int main(void)
 	//Enables interrupts
 	sei();
 	
-	
-	printf("start\n");
+
 	long int i = 0;
 	int a = 0;
 	ctrl_update_ref(0);
-
+	
 	while (1)
 	{
-		if (i++%20000 == 0)printf("running... curr_vel = %d, ref = %d, curr_u = %d, curr_error = %d, error_power = %d\n", curr_vel , ref_vel,  curr_u, curr_error,(int)(KI*error_sum));
+		_delay_ms(100);
+		struct can_frame message = CAN_frame_init(5,1);
+		message.data[0] = 100;
+		CAN_send_frame(&message);
+		printf("SENDING MESSAGE\n");
+	}
+	
+}
 
+/*
+		ir_detect_ball();
 		//Read CAN bus
 		struct can_frame message = CAN_receive_transmission();	
 		if (message.id != -1)
@@ -56,6 +65,8 @@ int main(void)
 			}
 			
 		}
-	}
-	
-}
+		else
+		{
+			if (i++ % 5000 == 0) printf("...\n");
+		}
+	*/	
