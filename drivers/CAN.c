@@ -3,6 +3,7 @@
 #include "../node 2/node 2/local_drivers/motor_control.h"
 #endif
 
+#include "f_cpu.h"
 #include <stdio.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -138,7 +139,7 @@ int message_received_flag()
 
 void CAN_handle_message()
 {
-	#if __AVR_ATmega2560__
+	
 	//Collects the message
 	struct can_frame message = CAN_receive_transmission();
 
@@ -148,13 +149,19 @@ void CAN_handle_message()
 		{
 			break;
 		}
-		case (ID_INPUT_UPDATE):	//MESSAGE IS CONTROL UPDATE, [x_pos, y_pos, joystick_button]
+		
+		#ifdef __AVR_ATmega2560__  //THESE IDS ARE ONLY RELEVANT FOR NODE 2
+		case (ID_INPUT_UPDATE):	//MESSAGE IS CONTROL UPDATE, [x_pos, y_pos, joystick_button, lbutton, rbutton]
 		{
 			//Sends data right to regulator
 			ctrl_update_ref(message.data[0] / REFERENCE_DIVIDER);
-
+			printf("INPUT RECEIVED %d\n", message.data[0]);
+			
 			//Fires solenoid
 			if (message.data[2]) ctrl_fire_sol();
+			
+			//Updates servo position
+			
 			break;
 		}
 		case (ID_REGULATOR_KP): //MESSAGE IS UPDATE TO KP PARAMETER, //Should be message of length 2 with the KP parameter, 1 -> higher bits, 2 -> lower bits
@@ -162,6 +169,7 @@ void CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
+			printf("KP UPDATE RECEIVED %d\n", data);
 			break;
 		}
 		case (ID_REGULATOR_KI): //MESSAGE IS UPDATE TO KP PARAMETER, //Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
@@ -169,17 +177,18 @@ void CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
+			printf("KI UPDATE RECEIVED %d\n", data);
 			break;
 		}
-		case(ID_RETURN_IR_SENSOR_TRIGGERED):
+		#elif __AVR_ATmega162__ //THESE IDS ARE ONLY RELEVANT FOR NODE 1
+		case (ID_IR_SENSOR_TRIGGERED): //Ball is detected -> game over
 		{
-			printf("HHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEL");
-			the_end(); 
-			
-			break; 
+			printf("GAME OVER\n");
+			break;
 		}
+		#endif
 	}
-	#endif
+	
 }
 
 void CAN_send_parameter(int id, float parameter)

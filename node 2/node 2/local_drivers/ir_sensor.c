@@ -1,50 +1,37 @@
 #include "ir_sensor.h"
 #include "ADC_2560.h"
-#include <util/delay.h>
-#include "../../../drivers/f_cpu.h"
 
 #define VOLTAGE_THRESHOLD 25 //[0-1023]
 #define IR_PIN 0
-#define IR_DETECTION_DELAY 30000 //in clock cycles
+#define DETECTION_LIMIT 10 //If ball is detected 10 times in a row, send game over signal. Filters noise
 
-volatile uint16_t number_detections = 0;
-volatile int value_history;
-volatile uint64_t cycles_since_detection = 0;
-volatile int filter_enable = 0;
+volatile uint16_t detection_count = 0;
 
 
 
 void ir_init()
 {
 	adc2560_init();
-	value_history = adc2560_read_bin(IR_PIN);
+	detection_count = 0;
 }
 
-int ir_get_score()
-{
-	return number_detections;
-}
-
-void ir_detect_ball()
+int ir_detect_ball()
 {
 	int voltage = adc2560_read_bin(IR_PIN);
 	
-	if (voltage < VOLTAGE_THRESHOLD && value_history > VOLTAGE_THRESHOLD && !filter_enable)
+	if (voltage < VOLTAGE_THRESHOLD)
 	{
-		number_detections++;
-		cycles_since_detection = 0;
-		filter_enable = 1;
-		CAN_send_parameter(4,1); // Sends to node 1, that the ir sensor is triggered
-		printf("aidddddddddddddddds\n");
+		//Increase detection count
+		detection_count++;
+		
+		//If we have enough detections the ball is detected
+		if (detection_count > DETECTION_LIMIT) return 1;
+	}
+	else
+	{
+		detection_count = 0; //If ball isnt detected reset counter
 	}
 	
-	//Update voltage history
-	value_history = voltage;
-	//printf("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiv");
-	CAN_send_parameter(4,1);
-	//Update filter-cycle counter
-	cycles_since_detection++;
-	//If enough time has passed, allow detection
-	if (cycles_since_detection > IR_DETECTION_DELAY) filter_enable = 0;
+	return 0;
 }
 

@@ -10,7 +10,6 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/sleep.h>
 
 //Functions
 void UART_init(int baudrate);

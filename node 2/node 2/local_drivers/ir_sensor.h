@@ -12,8 +12,6 @@
 
 void ir_init(); //Initialises the ir sensor software
 
-int ir_get_score(); //Returns score
-
-void ir_detect_ball(); //Updates internal scorecounter
+int ir_detect_ball(); //Returns 1 if ball is detected, otherwise 0
 
 #endif

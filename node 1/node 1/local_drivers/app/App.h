@@ -16,13 +16,15 @@ int CURRENT_SONG;
 int HIGHSCORE_LIST[10];
 char HIGHSCORE_LIST_NAMES[10][4];
 int EXIT_APPLICATION; 
+long int CURRENT_SCORE;
 
 
 /*   Functions   */
 void app_init(); //Initializes the game
 void app_logo(); //Shows logo
 void app_setup(); //Allows user to choose difficult, music etc
-void app_run(); //Game loop
+void app_show_gamescreen(); //Shows the score on the oled while the game is running
+void app_quit_gamescreen();
 int app_endscreen(); //Shows score, allows player to restart
 void app_start(); //Starts the application, -> setup -> game loop
 void app_goodbye_message(); //Thanks the player for waiting
@@ -33,7 +35,7 @@ void opt_select_name(); //selects name
 void opt_select_difficulty(); // selects level of difficulty 
 void opt_select_music(); // select witch song you want to play
 void view_highscore(); // view highscore
-void opt_start_game(); //Starts the game loop 
+void opt_run_game(); //Starts the game loop 
 void opt_exit_application();  // exits the application 
 
 /* Utility function */

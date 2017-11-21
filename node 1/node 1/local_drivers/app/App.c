@@ -4,6 +4,7 @@
 #include "f_cpu.h"
 #include "ADC_driver.h"
 #include "music.h"
+#include "CAN.h"
 
 #include <util/delay.h>
 
@@ -50,6 +51,7 @@ void app_init()
 	oled_init();
 	adc_init();
 	music_init();
+	CAN_init(CAN_MODE_NORMAL);
 	
 	//Shows logo
 	music_start_up_sound();
@@ -76,7 +78,7 @@ void app_init()
 	
 	menu_constr(&main_menu, "Main Menu");
 	
-	opt_constr(&start_game, "Start Game", opt_start_game); 
+	opt_constr(&start_game, "Start Game", opt_run_game); 
 	main_menu.root_option = &start_game;
 	
 	opt_constr(&go_to_settings, "Settings", NULL);
@@ -116,7 +118,8 @@ void app_run()
 		
 		menu_control(&main_menu);
 		oled_update_from_SRAM();
-		adc_update_current_input();
+		
+
 	}
 	
 	//thanks player for playing
@@ -194,6 +197,33 @@ char* int_to_cstring(int t)
 	sprintf(str, "%d", t);
 	return str;
 }
+
+void app_show_gamescreen()
+{
+	//prints current score
+	oled_home();
+	oled_clear_SRAM();
+	oled_cstring_write("The game has started", 1);
+	oled_go_to(0,3);
+	oled_cstring_write("Current score: " ,1);
+	oled_go_to(80,3);
+	oled_cstring_write(int_to_cstring(CURRENT_SCORE) ,1);
+	oled_update_from_SRAM();
+}
+
+void app_quit_gamescreen()
+{
+	oled_clear_SRAM();
+	oled_home();
+	oled_cstring_write("You lost", 1);
+	oled_go_to(0,3);
+	oled_cstring_write("joystick left = play Again",1);
+	oled_go_to(0,4);
+	oled_cstring_write("joystick right = Leave to main menu",1);
+	oled_update_from_SRAM();
+}
+
+
 
 
 

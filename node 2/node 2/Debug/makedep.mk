@@ -10,6 +10,8 @@
 
 ..\..\drivers\UART_driver.c
 
+app\app.c
+
 local_drivers\ADC_2560.c
 
 local_drivers\DAC.c

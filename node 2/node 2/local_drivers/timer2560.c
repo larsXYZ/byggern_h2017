@@ -22,8 +22,6 @@ int timer2560_init()
 //Enables interrupt vector, regulates when timer goes off
 ISR(TIMER3_COMPA_vect)
 {
-	//printf("%d, %d ",OCR3A,TCNT3);
 	ctrl_regulate();
-	//printf("Test\n");
 }
 

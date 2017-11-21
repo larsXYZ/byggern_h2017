@@ -175,7 +175,7 @@ void view_highscore()
 		
 		for (int i = 0; i < 5; i += 2)
 		{
-			//Prints i higscore
+			//Prints i highscore
 			oled_go_to(1,2+i);
 			oled_cstring_write(int_to_cstring(i+1),1);
 			oled_cstring_write(". ",1);
@@ -203,94 +203,32 @@ void view_highscore()
 
 }
 
-void opt_start_game()
+void opt_run_game()
 {
-	char current_score[10] = "0";  
+	CURRENT_SCORE = 0;
 	int back_to_menu = 0;
-	EXIT_APPLICATION = 0; 
-
-	oled_clear_SRAM();
-	oled_home(); 
-	oled_cstring_write("The game has started", 1);
-	oled_update_from_SRAM();
+	EXIT_APPLICATION = 0;
 	
 	while (!back_to_menu) // game loop
 	{
-		adc_update_current_input();
-		if(joystick_left()) //checks if player want to leave game 
+		
+		//Update input
+		int diff = adc_update_current_input();
+		if(diff != 0)
 		{
-			oled_clear_SRAM();
-			oled_home();
-			oled_cstring_write("Are u sure u want to leave?", 1);
-			oled_go_to(0,3); 
-			oled_cstring_write("joytick left = yes",1);
-			oled_go_to(0,4);
-			oled_cstring_write("joytick right = no",1);
-			oled_update_from_SRAM();
-			while(1)
-			{
-				adc_update_current_input();
-				if(joystick_left())
-				{
-					 back_to_menu = 1;
-					 break;
-				}
-				if(joystick_right())
-				{
-					oled_clear_SRAM();
-					break; 
-					
-				}	
-			}
+			send_current_input();
+			printf("Send input %d\n", diff);
 		}
 		
-	    //prints current score 
-		oled_home();
-		oled_cstring_write("The game has started", 1);
-		oled_go_to(0,3);
-		oled_cstring_write("Current score: " ,1);
-		oled_go_to(80,3);
-		oled_cstring_write(current_score ,1);
-		oled_update_from_SRAM();
+		//Show game screen
+		app_show_gamescreen();
 		
-		//Lost the game?  
-		CAN_handle_message();//see if the player lost 
-		if(EXIT_APPLICATION)
-		{
-			oled_clear_SRAM();
-			oled_home();
-			oled_cstring_write("You lost", 1);
-			oled_go_to(0,3);
-			oled_cstring_write("joytick left = play Again",1);
-			oled_go_to(0,4);
-			oled_cstring_write("joytick right = Leave to main menu",1);
-			oled_update_from_SRAM();
-			while(1)
-			{
-				
-			
-				adc_update_current_input();
-				if(joystick_left())
-				{
-					back_to_menu = 1;
-					break;
-				}
-				if(joystick_right())
-				{
-					current_score[10] = "0"; 
-					EXIT_APPLICATION = 0;
-				
-
-					oled_clear_SRAM();
-					oled_home();
-					oled_cstring_write("The game has started", 1);
-					oled_update_from_SRAM();
-						
-			}
-			}
-			
-			
-		}
+		//Handle input
+		CAN_handle_message();
+		
+		//Update score
+		if (CURRENT_SCORE < 999 000 000)CURRENT_SCORE++;
+		
 		
 	}
 	

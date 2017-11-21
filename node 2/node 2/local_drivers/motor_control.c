@@ -1,6 +1,6 @@
 #include "motor_control.h"
 #include "DAC.h"
-#include "drivers/f_cpu.h"
+#include "f_cpu.h"
 #include "timer2560.h"
 #include <avr/io.h>
 #include <util/delay.h>
@@ -83,6 +83,8 @@ int16_t ctrl_read_encoder()
 
 void ctrl_regulate()
 {	
+	
+	
 	//Measure velocity
 	curr_vel = ctrl_read_encoder();
 	
@@ -101,7 +103,6 @@ void ctrl_regulate()
 	
 	//Apply 
 	ctrl_apply_voltage(curr_u);
-	
 }
 
 void ctrl_update_ref(int r)

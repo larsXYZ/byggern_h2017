@@ -62,7 +62,9 @@ int adc_slider_position_right();
 void adc_print_inputs();
 
 //Update inputs
-void adc_update_current_input();
+int adc_update_current_input(); //Returns 1 if there is any difference between the new input and the old one, with a deadzone
+int compare_new_input(); //Compares new input to old, checks if there is difference
+
 
 //Control functions, returns 1 if condition is true, 0 else
 int joystick_down();
@@ -70,6 +72,8 @@ int joystick_up();
 int joystick_left();
 int joystick_right();
 
+//Sends current input via CAN to node 2
+void send_current_input();
 
 
 #endif
