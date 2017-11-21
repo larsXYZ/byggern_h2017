@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "f_cpu.h"
 
+//Se .h file for function explanations
+
 static FILE usart_stdout = FDEV_SETUP_STREAM(UART_send, NULL, _FDEV_SETUP_WRITE);
 
 void UART_init(int baudrate)

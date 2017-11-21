@@ -81,8 +81,6 @@ void setup()
   //Activate Serial
   Serial.begin(9600);
 
-  
-
   //Waits for node 1 to enable music
   while (!start)
   {
@@ -94,8 +92,6 @@ void setup()
     }
   }
   
-  //Plays startup sound
-  play_song(songList[3]);
   Serial.println("SETUP COMPLETED");
   delay(3000);
 }

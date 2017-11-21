@@ -2,6 +2,8 @@
 #include <avr/io.h>
 #include <stdio.h>
 
+//See .h file for function explanations
+
 void adc2560_init()
 {
 	//Enable ADC

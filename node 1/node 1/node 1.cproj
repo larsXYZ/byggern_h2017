@@ -190,9 +190,6 @@
     <Compile Include="local_drivers\hardware\ext_mem_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="local_drivers\hardware\ext_mem_test.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="local_drivers\hardware\fonts.h">
       <SubType>compile</SubType>
     </Compile>

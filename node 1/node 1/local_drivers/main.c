@@ -9,7 +9,6 @@
 
 int main(void)
 { 
-	printf("START\n");
 	app_init(); //Initializes game
 	app_setup(); //Enter name, difficulty, etc
 	while (1)

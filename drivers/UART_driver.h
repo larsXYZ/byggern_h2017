@@ -1,7 +1,7 @@
 /*
 	UART DRIVER
-    -Allows communication with PC via serial
-    -Supports ATMEGA162 & ATMEGA2560
+    -Enables comm with pc via serial
+    -Supports ATmega162 & ATmega2560
 */
 
 

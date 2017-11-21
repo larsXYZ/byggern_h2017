@@ -6,6 +6,8 @@
 #include "music.h"
 #include "CAN.h"
 
+//Se .h file for function explanations
+
 #include <util/delay.h>
 
 /*	Menu objects   */
@@ -53,7 +55,7 @@ void app_init()
 	CAN_init(CAN_MODE_NORMAL);
 	
 	//Current score
-	CURRENT_SCORE = 255*100;
+	CURRENT_SCORE = 0;
 	
 	//Shows logo
 	music_start_up_sound();
@@ -62,33 +64,23 @@ void app_init()
 	//Creating menus
 	menu_constr(&setup_menu, "Settings");
 	setup_menu.parent_menu = &main_menu;
-	
 	opt_constr(&enter_name,"Enter Name", opt_select_name);
 	setup_menu.root_option = &enter_name;
 	enter_name.parent = &setup_menu;
-	
 	opt_constr(&enter_music,"Music Selection", opt_select_music);
 	enter_name.next = &enter_music;
-	
 	opt_constr(&enter_tuning_option,"Tuning", opt_select_tuning);
 	enter_music.next = &enter_tuning_option;
-	 
-	
 	opt_constr(&highscore, "Highscores", view_highscore);
 	enter_tuning_option.next = &highscore;
-	
 	menu_constr(&main_menu, "Main Menu");
-	
 	opt_constr(&start_game, "Start Game", opt_run_game); 
 	main_menu.root_option = &start_game;
-	
 	opt_constr(&go_to_settings, "Settings", NULL);
 	main_menu.root_option->next = &go_to_settings;
 	go_to_settings.submenu = &setup_menu;
-	
 	opt_constr(&exit_application, "Exit game", opt_exit_application);
 	go_to_settings.next = &exit_application; 
-	
 	menu_constr(&restart_menu, "ROUND OVER");
 	opt_constr(&restart_game,"Continue",opt_continue_game);
 	opt_constr(&end_game, "End game",opt_end_game);
@@ -101,7 +93,6 @@ void app_init()
 
 void app_setup()
 {
-		
 	opt_select_name(); 
 	opt_select_tuning();
 	opt_select_music(); 
@@ -109,12 +100,13 @@ void app_setup()
 
 int app_main_menu()
 {
+	//Clears screen and prints menu
 	NEXT_MENU = 0; 
 	oled_clear_SRAM();
 	oled_update_from_SRAM();
 	menu_print(&main_menu);
 	
-	
+	//Reads player input in menu
 	while (!NEXT_MENU)
 	{
 		adc_update_current_input();
@@ -122,14 +114,16 @@ int app_main_menu()
 		oled_update_from_SRAM();
 	}
 	
-	if (NEXT_MENU == 2) return 1;
+	//Checks if player quit the game or started a round
+	if (NEXT_MENU == 2) 
+	{
+		return 1;
+	}
 	else
 	{
 		NEXT_MENU = 0;
 		return 0;
 	}
-	
-	
 }
 
 
@@ -142,10 +136,7 @@ void app_run()
 	{
 		
 		//Update input, if the change from the last transmitted value is large enough we transmit the new values
-		if(adc_update_current_input() != 0)
-		{
-			send_current_input();
-		}
+		if(adc_update_current_input() != 0) send_current_input();
 		
 		//Show game screen
 		app_show_gamescreen();
@@ -210,19 +201,13 @@ void app_logo()
 	oled_write_line(95,25,87,25);
 	oled_write_line(87,25,95,40);
 	
+	//Course name
 	oled_go_to(50,7);
 	oled_cstring_write("TTK4155, H2017",1);
 
+	//Update oled and waits
 	oled_update_from_SRAM();
-	_delay_ms(1000);
-}
-
-char* int_to_cstring(int t)
-{
-	
-	char str[12];
-	sprintf(str, "%d", t);
-	return str;
+	_delay_ms(3000);
 }
 
 void app_show_gamescreen()
@@ -237,10 +222,6 @@ void app_show_gamescreen()
 	oled_update_from_SRAM();
 }
 
-void opt_exit_application()
-{
-	NEXT_MENU = 2;
-}
 
 void app_goodbye_message()
 {
@@ -258,6 +239,9 @@ void app_goodbye_message()
 
 int app_round_review()
 {
+	//Plays end game soundeffect
+	music_ending_sound();
+	
 	//Clears and prints menu
 	oled_clear_SRAM();
 	menu_print(&restart_menu);
@@ -292,14 +276,11 @@ int app_round_review()
 	}
 }
 
-void opt_end_game()
+char* int_to_cstring(int t)
 {
-	NEXT_MENU = 1;
-}
-
-void opt_continue_game()
-{
-	NEXT_MENU = 0;
+	char str[12];
+	sprintf(str, "%d", t);
+	return str;
 }
 
 void update_highscore()

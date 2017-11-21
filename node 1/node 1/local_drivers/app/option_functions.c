@@ -225,10 +225,7 @@ void view_highscore()
 
 }
 
-void opt_run_game()
-{
-	NEXT_MENU = 1;
-}
-
-
-
+void opt_run_game(){ NEXT_MENU = 1; }
+void opt_end_game(){ NEXT_MENU = 1; }
+void opt_continue_game(){ NEXT_MENU = 0; }
+void opt_exit_application(){ NEXT_MENU = 2; }

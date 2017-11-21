@@ -1,7 +1,8 @@
 /*
 	DRIVER FOR CAN BUS
-		-SUPPORTS LOOPBACK AND NORMAL MODE
-		-INTERRUPT BASED
+		- Enables communication between node 1 and 2
+		- Supports loopback mode
+		- Interrupt based
 */
 
 #ifndef CAN
@@ -29,19 +30,12 @@ struct can_frame
 };
 
 /* Driver for CAN-bus operations */
-
 void CAN_init(char mode); //Initializes the CAN operations, mode[0-1]: 0->loopback mode, 1->normal operation
-
 void CAN_send_frame(struct can_frame* message); //Sends a CAN message
-
 struct can_frame CAN_receive_transmission(); //Receives transmission
-
 int CAN_int_vector(); //Interrupt vector
-
 int message_received_flag(); //Returns message_received flag
-
 struct can_frame CAN_frame_init(int id, uint8_t len); //Creates an empty CAN-std-frame
-
 int CAN_handle_message(); //Node 2 needs to do different things depending on what kind of message was received, it can return values, look at each case to determine if it will
 
 void CAN_send_parameter(int id, float parameter);	//Node 1 needs to send regulator parameters to node 2 sometimes,

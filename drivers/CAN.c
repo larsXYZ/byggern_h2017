@@ -9,6 +9,8 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+//Se .h file for function explanations
+
 volatile int message_received = 0;
 
 void CAN_init(char mode)
@@ -156,7 +158,6 @@ int CAN_handle_message()
 		{
 			//Sends data right to regulator
 			ctrl_update_ref(message.data[0] / REFERENCE_DIVIDER);
-			printf("INPUT RECEIVED %d\n", message.data[0]);
 			
 			//Fires solenoid
 			if (message.data[2]) ctrl_fire_sol();
@@ -172,7 +173,6 @@ int CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
-			printf("KP UPDATE RECEIVED %d\n", data);
 			break;
 		}
 		case (ID_REGULATOR_KI): //MESSAGE IS UPDATE TO KP PARAMETER, //Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
@@ -180,7 +180,6 @@ int CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
-			printf("KI UPDATE RECEIVED %d\n", data);
 			break;
 		}
 		#elif __AVR_ATmega162__ //THESE IDS ARE ONLY RELEVANT FOR NODE 1

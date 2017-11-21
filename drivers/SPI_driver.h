@@ -1,6 +1,6 @@
 /*
 	SPI DRIVER
-    -SUPPORTS SEVERAL SLAVES
+    -Supports several slaves
 */
 
 #ifndef SPI_DRIVER

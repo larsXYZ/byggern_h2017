@@ -2,6 +2,8 @@
 #include <avr/io.h>
 #include "MCP2515.h"
 
+//Se .h file for function explanations
+
 //Definitions of SPI pins
 #ifdef  __AVR_ATmega162__
 

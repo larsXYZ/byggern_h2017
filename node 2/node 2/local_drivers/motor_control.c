@@ -6,6 +6,8 @@
 #include <util/delay.h>
 #include <stdio.h>
 
+//See .h file for function explanations
+
 //PIN DEFINITIONS
 #define EN PH4
 #define RST_ PH6

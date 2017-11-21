@@ -3,10 +3,11 @@
 #include "f_cpu.h"
 #include <util/delay.h>
 
+//See .h file for function explanations
+
 /*COMMUNICATION PINS*/
 #define SELECT_PORT PORTB
 #define SELECT_PIN PB0
-
 #define FUNCTION_PORT PORTD
 #define CTRL_MODE_PIN PD4
 #define DIRECTION_PIN PD5

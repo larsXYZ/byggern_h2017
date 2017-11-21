@@ -3,6 +3,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+//See .h file for function explanations
+
 #define DAC_SLAVE_ADDRESS 0x50
 
 void DAC_init()

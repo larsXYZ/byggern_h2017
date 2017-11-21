@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//See .h file for explanations
+
 //AVR LIBRARIES
 #include <avr/io.h>
 #include <avr/interrupt.h>

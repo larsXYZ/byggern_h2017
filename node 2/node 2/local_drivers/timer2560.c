@@ -4,9 +4,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+//See .h file for function explanations
+
 int timer2560_init()
 {
-	
 	TCCR3A |= (1 << WGM31) | (0 << WGM30); //ENABLE CTC MODE
 	TCCR3B |= (1 << WGM32) | (0 << WGM33); //ENABLE CTC MODE
 	

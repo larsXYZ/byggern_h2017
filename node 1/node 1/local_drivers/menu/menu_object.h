@@ -1,3 +1,10 @@
+/*
+	DRIVER ENABLING THE MENU SYSTEM
+		- Contains menu object and option object
+		- Menu object contains a linked list of option objects
+		- Option objects have a designated function and a name, they also can point to a submenu
+*/
+
 #ifndef MENU_OBJECT
 #define MENU_OBJECT
 

@@ -7,6 +7,7 @@
 #include "ir_sensor.h"
 #include "pwm.h"
 
+//Se .h file for function explanations
 
 void game_init()
 {

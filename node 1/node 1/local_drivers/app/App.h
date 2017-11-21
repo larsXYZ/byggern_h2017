@@ -1,5 +1,12 @@
 /*
-			GAME APPLICATION
+		GAME APPLICATION
+			-Implements Pinboard game
+			-Extras:
+				- SRAM buffering
+				- Fancy screen graphics
+				- Arduino Uno music node
+				- Live regulator tuning
+				- Highscore lists
 */
 
 #ifndef _APP
@@ -30,11 +37,10 @@ void app_logo(); //Shows logo
 void app_setup(); //Allows user to choose difficult, music etc
 int app_main_menu(); //Gives access to main menu, before a game starts. Returns 1 if player quits game
 void app_run(); //Game loop
-int app_round_review();
+int app_round_review(); //After a round the player is shown the score and can quit or continue
 void app_show_gamescreen(); //Shows the score on the oled while the game is running
 int app_endscreen(); //Shows score, allows player to restart
 void app_goodbye_message(); //Thanks the player for waiting
-
 
 /*	Menu - actions	*/
 void opt_select_name(); //selects name 
@@ -47,8 +53,8 @@ void opt_end_game(); // If player choose to not restart game, we run this functi
 void opt_continue_game(); //If the player choose to continue we run this function
 
 /* Utility function */
-char* int_to_cstring(int t);
-void update_highscore();
+char* int_to_cstring(int t); //Converts int to cstring, max 8 bits
+void update_highscore();	//Updates highscore list with current score and playername
 
 
 #endif

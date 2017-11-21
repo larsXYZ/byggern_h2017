@@ -1,6 +1,8 @@
 #include "MCP2515.h"
 #include "SPI_driver.h"
 
+//Se .h file for function explanations
+
 void MCP_init()
 {
 	SPI_init();

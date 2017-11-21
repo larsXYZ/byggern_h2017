@@ -2,7 +2,7 @@
 #include "drivers/f_cpu.h"
 #include <avr/io.h>
 
-
+//See .h file for function explanations
 
 int pwm_init()
 {

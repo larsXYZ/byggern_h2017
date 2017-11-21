@@ -165,7 +165,6 @@ Copyright 2003 Kimberly Otten Software Consulting
 
 
 // CAN CONTROLLER FUNCTIONS
-
 void MCP_write(char byte, char address); //Writes byte to address on MCP
 char MCP_read(char address); //Reads value from address on MCP
 void MCP_bit_modify(char address, char mask_byte, char data_byte); //Basically MCP_read but with a masking byte allowing to only change specific bits
@@ -173,7 +172,7 @@ void MCP_RTS(char buffer); //Initiates message transmission of tx-buffer[0-2]
 void MCP_reset(); //Re-initializes the internal registers of the MCP
 char MCP_status(); //Returns info about frame type etc.
 char MCP_rx_status(); //Returns info about the rx buffers.
-void MCP_init();
+void MCP_init(); //Initializes chip
 
 //MCP_read_rx_buffer Reads a receive buffer mode[0-3]
 //nm | Address Points to                 | Address

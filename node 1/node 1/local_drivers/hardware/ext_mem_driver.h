@@ -1,5 +1,6 @@
 /*
 	DRIVER INTERFACING THE EXTERNAL SRAM CHIP
+		-Enables SRAM buffering for oled
 		
 */
 

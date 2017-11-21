@@ -3,6 +3,8 @@
 #include "f_cpu.h"
 #include <stdio.h>
 
+//See .h file for function explanations
+
 //AVR LIBRARIES
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -14,7 +16,11 @@ volatile int finished = 0;
 
 //Variable containing previous inputs, to limit one input registering as several
 struct input PREV_INPUT;
+
+//Variable containing last transmitted control inputs to node 2. This prevents overuse of CAN bus as we only send messages when there is a change to report
 struct input LAST_TRANSMITTED_INPUT;
+
+//Controller deadzones
 #define JOYSTICK_MENU_DEADZONE 60
 #define JOYSTICK_TRANSMIT_DEADZONE 6
 #define JOYSTICK_ZERO_DEADZONE 8
@@ -84,7 +90,6 @@ struct j_pos adc_joy_position()
 	joystick_x_perc = 100*(joystick_x_analog - x_mid_point)/((float)127);
 	joystick_y_perc = 100*(joystick_y_analog - y_mid_point)/((float)127);
 	
-	
 	//Assignes value
 	pos.x_p = joystick_x_perc;
 	pos.y_p = joystick_y_perc;
@@ -95,13 +100,13 @@ struct j_pos adc_joy_position()
 
 int adc_slider_position_left()
 {
-	return 100*adc_read(3)/((float)255);
+	return 100*adc_read(3)/((float)255); //Returns slider position [0-100]
 }
 
-int adc_slider_position_right()
+int adc_slider_position_right() 
 {
 	
-	return 100*adc_read(4)/((float)255);
+	return 100*adc_read(4)/((float)255); //Returns slider position [0-100]
 }
 
 void adc_print_inputs()
@@ -151,31 +156,34 @@ int adc_update_current_input()
 
 int joystick_down()
 {
-	return (PREV_INPUT.joystick.y_p > -JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.y_p < -JOYSTICK_MENU_DEADZONE);
+	return (PREV_INPUT.joystick.y_p > -JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.y_p < -JOYSTICK_MENU_DEADZONE); //Returns 1 if joystick was moved this frame
 }
 
 int joystick_up()
 {
-	return (PREV_INPUT.joystick.y_p < JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.y_p > JOYSTICK_MENU_DEADZONE);
+	return (PREV_INPUT.joystick.y_p < JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.y_p > JOYSTICK_MENU_DEADZONE); //Returns 1 if joystick was moved this frame
 }
 
 int joystick_left()
 {
-	return (PREV_INPUT.joystick.x_p > -JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.x_p < -JOYSTICK_MENU_DEADZONE);
+	return (PREV_INPUT.joystick.x_p > -JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.x_p < -JOYSTICK_MENU_DEADZONE); //Returns 1 if joystick was moved this frame
 }
 
 int joystick_right()
 {
-	return (PREV_INPUT.joystick.x_p < JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.x_p > JOYSTICK_MENU_DEADZONE);
+	return (PREV_INPUT.joystick.x_p < JOYSTICK_MENU_DEADZONE && CURRENT_INPUT.joystick.x_p > JOYSTICK_MENU_DEADZONE); //Returns 1 if joystick was moved this frame
 }
 
 void send_current_input()
 {
+	//Creates CAN frame and fills it with input data
 	struct can_frame message = CAN_frame_init(ID_INPUT_UPDATE,4);
 	message.data[0] = CURRENT_INPUT.joystick.x_p;
 	message.data[1] = CURRENT_INPUT.joystick.x_p;
 	message.data[2] = CURRENT_INPUT.joystick.button;
 	message.data[3] = CURRENT_INPUT.slider_l;
+	
+	//Sends CAN frame and updates last transmitted data
 	CAN_send_frame(&message);
 	LAST_TRANSMITTED_INPUT = CURRENT_INPUT;
 }
@@ -184,7 +192,7 @@ int compare_new_input(struct input new_input)
 {
 	int difference = 0;
 	
-	//Compare binary values, if they are pressed we have to send a message. This is due to how our controls are set up
+	//Compare binary values
 	if (PREV_INPUT.button_l != LAST_TRANSMITTED_INPUT.button_l) return 1;
 	if (PREV_INPUT.button_r != LAST_TRANSMITTED_INPUT.button_r) return 10;
 	if (PREV_INPUT.joystick.button) return 100;
