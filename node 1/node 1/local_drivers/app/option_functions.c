@@ -4,6 +4,7 @@
 #include "f_cpu.h"
 #include "ADC_driver.h"
 #include "menu_object.h"
+#include "CAN.h"
 #include <util\delay.h>
 
 
@@ -59,12 +60,12 @@ void opt_select_name()
 		
 	}
 		
-void opt_select_difficulty()
+void opt_select_tuning()
 {
 		
 		oled_clear_SRAM();
 		oled_home(); 
-		oled_cstring_write("Difficulty:", 2);
+		oled_cstring_write("Tuning:", 2);
 		
 		int change = 1; 
 		int completed= 0; 
@@ -75,37 +76,56 @@ void opt_select_difficulty()
 			//Read ADC
 			adc_update_current_input();
 			
-			
 			//Reads input and decides min and max levels
-			
 			if(joystick_left()) completed = 1;
 			if(joystick_right()) completed = 1;
-			if (joystick_up() && CURRENT_DIFFICULTY < 2)
+			if (joystick_up() && CURRENT_TUNING < MAX_DIFFICULTY)
 			{
-				 CURRENT_DIFFICULTY++;
+				 CURRENT_TUNING++;
 				 change = 1; 
 			} 
-			if (joystick_down() && CURRENT_DIFFICULTY > 0)
+			if (joystick_down() && CURRENT_TUNING > 0)
 			{
-				 CURRENT_DIFFICULTY--;
+				 CURRENT_TUNING--;
 				 change = 1;
 			}
 
 			//print current level
 			oled_go_to(60,3);
-			oled_cstring_write(DIFFICULTY_NAME[CURRENT_DIFFICULTY],2);
+			oled_cstring_write(TUNING_NAME[CURRENT_TUNING],2);
 			oled_update_from_SRAM();
-			
-			
 			
 			if (change!= 0)
 			{
 				change = 0; 
 				_delay_ms(200);
 			}
-			
+		}
+		
+		//Send parameters to Node 2
+		switch (CURRENT_TUNING)
+		{
+			case (0):
+			{
+				CAN_send_parameter(ID_REGULATOR_KP, 7.5);
+				CAN_send_parameter(ID_REGULATOR_KI, 0.4);
+				break;
+			}
+			case (1):
+			{
+				CAN_send_parameter(ID_REGULATOR_KP, 3.5);
+				CAN_send_parameter(ID_REGULATOR_KI, 0.3);
+				break;
+			}
+			case (2):
+			{
+				CAN_send_parameter(ID_REGULATOR_KP, 9);
+				CAN_send_parameter(ID_REGULATOR_KI, 0.6);
+				break;
+			}
 			
 		}
+		
 	
 }
 
@@ -134,11 +154,13 @@ void opt_select_music()
 		if (joystick_up() && CURRENT_SONG < 2)
 		{
 			CURRENT_SONG++;
+			music_next_song();
 			change = 1;
 		}
 		if (joystick_down() && CURRENT_SONG > 0)
 		{
 			CURRENT_SONG--;
+			music_prev_song();
 			change = 1;
 		}
 		
@@ -205,43 +227,8 @@ void view_highscore()
 
 void opt_run_game()
 {
-	CURRENT_SCORE = 0;
-	int back_to_menu = 0;
-	EXIT_APPLICATION = 0;
-	
-	while (!back_to_menu) // game loop
-	{
-		
-		//Update input
-		int diff = adc_update_current_input();
-		if(diff != 0)
-		{
-			send_current_input();
-			printf("Send input %d\n", diff);
-		}
-		
-		//Show game screen
-		app_show_gamescreen();
-		
-		//Handle input
-		CAN_handle_message();
-		
-		//Update score
-		if (CURRENT_SCORE < 999 000 000)CURRENT_SCORE++;
-		
-		
-	}
-	
-	
-}
-
-void opt_exit_application()
-{
-	EXIT_APPLICATION = 1; 
-	
+	NEXT_MENU = 1;
 }
 
 
-	
-	
 

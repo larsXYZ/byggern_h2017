@@ -26,6 +26,9 @@ void game_init()
 	ctrl_init();
 	ctrl_update_ref(0);
 	
+	//Pwm init
+	pwm_init();
+	
 	//Enables interrupts
 	sei();
 	
@@ -40,8 +43,7 @@ void game_loop()
 		//Listen for messages from node 1
 		CAN_handle_message();
 		
-		
-		//Check if ball is detected, if it is notify node 1
+		//Check if ball is detected, if it is -> notify node 1
 		if (ir_detect_ball())
 		{
 			while (1)

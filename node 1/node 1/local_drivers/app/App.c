@@ -10,19 +10,24 @@
 
 /*	Menu objects   */
 struct menu setup_menu;
+struct menu main_menu;
+struct menu restart_menu;
+
 struct option enter_name;
 struct option enter_music;
-struct option enter_difficulty_option;
+struct option enter_tuning_option;
 struct option highscore; 
 struct option go_to_settings;
 struct option start_game;
 struct option exit_application;
+struct option restart_game;
+struct option end_game;
 
-struct menu main_menu;
 
-//Difficulty level:
-int CURRENT_DIFFICULTY = 0;
-char DIFFICULTY_NAME[3][5] = {"EASY","NORM","HARD"};
+
+//Tuning level:
+int CURRENT_TUNING = 0;
+char TUNING_NAME[3][5] = {"NORM","FAST","SLOW"};
 
 /*   Player name   */
 char PLAYER_NAME[] = "AAA";
@@ -38,12 +43,6 @@ int EXIT_APPLICATION = 0;
 
 
 
-
-void the_end()
-{
-	EXIT_APPLICATION = 1;
-}
-
 void app_init()
 {
 	//Initialize drivers
@@ -52,6 +51,9 @@ void app_init()
 	adc_init();
 	music_init();
 	CAN_init(CAN_MODE_NORMAL);
+	
+	//Current score
+	CURRENT_SCORE = 255*100;
 	
 	//Shows logo
 	music_start_up_sound();
@@ -68,13 +70,12 @@ void app_init()
 	opt_constr(&enter_music,"Music Selection", opt_select_music);
 	enter_name.next = &enter_music;
 	
-	opt_constr(&enter_difficulty_option,"Difficulty", opt_select_difficulty);
-	enter_music.next = &enter_difficulty_option;
+	opt_constr(&enter_tuning_option,"Tuning", opt_select_tuning);
+	enter_music.next = &enter_tuning_option;
 	 
 	
 	opt_constr(&highscore, "Highscores", view_highscore);
-	enter_difficulty_option.next = &highscore;
-	
+	enter_tuning_option.next = &highscore;
 	
 	menu_constr(&main_menu, "Main Menu");
 	
@@ -88,6 +89,11 @@ void app_init()
 	opt_constr(&exit_application, "Exit game", opt_exit_application);
 	go_to_settings.next = &exit_application; 
 	
+	menu_constr(&restart_menu, "ROUND OVER");
+	opt_constr(&restart_game,"Continue",opt_continue_game);
+	opt_constr(&end_game, "End game",opt_end_game);
+	restart_menu.root_option = &restart_game;
+	restart_game.next = &end_game;
 	
 	//Enable interrupts
 	sei();
@@ -97,39 +103,60 @@ void app_setup()
 {
 		
 	opt_select_name(); 
-	opt_select_difficulty();
+	opt_select_tuning();
 	opt_select_music(); 
+}
+
+int app_main_menu()
+{
+	NEXT_MENU = 0; 
+	oled_clear_SRAM();
+	oled_update_from_SRAM();
+	menu_print(&main_menu);
 	
-	//Printing menus
-	while (!EXIT_APPLICATION)
+	
+	while (!NEXT_MENU)
 	{
 		adc_update_current_input();
 		menu_control(&main_menu);
 		oled_update_from_SRAM();
 	}
-
+	
+	if (NEXT_MENU == 2) return 1;
+	else
+	{
+		NEXT_MENU = 0;
+		return 0;
+	}
+	
+	
 }
+
+
 	
 void app_run()
 {
-	//Printing menus
-	while (!EXIT_APPLICATION)
+	
+	//Game loop
+	while (1)
 	{
 		
-		menu_control(&main_menu);
-		oled_update_from_SRAM();
+		//Update input, if the change from the last transmitted value is large enough we transmit the new values
+		if(adc_update_current_input() != 0)
+		{
+			send_current_input();
+		}
 		
+		//Show game screen
+		app_show_gamescreen();
+		
+		//Handle input, checks for game over
+		if (CAN_handle_message()) return;
+		
+		//Update score
+		if (CURRENT_SCORE < MAX_SCORE) CURRENT_SCORE++;
 
 	}
-	
-	//thanks player for playing
-	oled_clear_SRAM();
-	oled_home(); 
-	oled_cstring_write("Thank u for playing", 1);
-	oled_update_from_SRAM();
-	_delay_ms(1500);
-	oled_clear_SRAM();
-	oled_update_from_SRAM();
 	
 }
 
@@ -200,28 +227,108 @@ char* int_to_cstring(int t)
 
 void app_show_gamescreen()
 {
-	//prints current score
 	oled_home();
 	oled_clear_SRAM();
 	oled_cstring_write("The game has started", 1);
 	oled_go_to(0,3);
 	oled_cstring_write("Current score: " ,1);
 	oled_go_to(80,3);
-	oled_cstring_write(int_to_cstring(CURRENT_SCORE) ,1);
+	oled_cstring_write(int_to_cstring(CURRENT_SCORE/SCORE_DIVIDER) ,1);
 	oled_update_from_SRAM();
 }
 
-void app_quit_gamescreen()
+void opt_exit_application()
+{
+	NEXT_MENU = 2;
+}
+
+void app_goodbye_message()
 {
 	oled_clear_SRAM();
-	oled_home();
-	oled_cstring_write("You lost", 1);
-	oled_go_to(0,3);
-	oled_cstring_write("joystick left = play Again",1);
-	oled_go_to(0,4);
-	oled_cstring_write("joystick right = Leave to main menu",1);
+	oled_update_from_SRAM();
+	oled_go_to(20,3);
+	oled_cstring_write("THANKS FOR",2);
+	oled_go_to(25,4);
+	oled_cstring_write("PLAYING!",2);
+	oled_update_from_SRAM();
+	_delay_ms(5000);
+	oled_clear_SRAM();
 	oled_update_from_SRAM();
 }
+
+int app_round_review()
+{
+	//Clears and prints menu
+	oled_clear_SRAM();
+	menu_print(&restart_menu);
+	oled_update_from_SRAM();
+	NEXT_MENU = 3;
+	
+	//Print score and await player choice
+	while (NEXT_MENU == 3)
+	{
+		adc_update_current_input();
+		menu_control(&restart_menu);
+		oled_write_line(1,64,127,64);
+		oled_go_to(5,6);
+		oled_cstring_write("YOUR SCORE: ",2);
+		oled_cstring_write(int_to_cstring(CURRENT_SCORE/SCORE_DIVIDER),1);
+		oled_update_from_SRAM();
+		
+	}
+	
+	//Update highscore
+	update_highscore();
+	CURRENT_SCORE = 0;
+	
+	//Executes player choice
+	if (NEXT_MENU) return 1;
+	else
+	{
+		oled_clear_SRAM();
+		oled_update_from_SRAM();
+		menu_print(&main_menu);
+		return 0;
+	}
+}
+
+void opt_end_game()
+{
+	NEXT_MENU = 1;
+}
+
+void opt_continue_game()
+{
+	NEXT_MENU = 0;
+}
+
+void update_highscore()
+{
+	//If score is 0 you dont get on highscore
+	if (CURRENT_SCORE == 0) return;
+	
+	//Finds your spot on the list
+	int i = 0;
+	while (CURRENT_SCORE/SCORE_DIVIDER < HIGHSCORE_LIST[i] && i < 10)	i++;
+
+	//Check if you are off the list
+	if (i > 9) return;
+	
+	//Put score on highscore list and move all other down
+	for (int q = 9;q > i; q--)
+	{
+		HIGHSCORE_LIST[q] = HIGHSCORE_LIST[q-1];
+		for (int t = 0; t < 4; t++) HIGHSCORE_LIST_NAMES[q][t] = HIGHSCORE_LIST_NAMES[q-1][t];
+	}
+	HIGHSCORE_LIST[i] = CURRENT_SCORE/SCORE_DIVIDER;
+	for (int t = 0; t < 4; t++) HIGHSCORE_LIST_NAMES[i][t] = PLAYER_NAME[t];
+}
+
+
+
+
+
+
 
 
 

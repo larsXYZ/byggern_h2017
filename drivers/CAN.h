@@ -42,7 +42,7 @@ int message_received_flag(); //Returns message_received flag
 
 struct can_frame CAN_frame_init(int id, uint8_t len); //Creates an empty CAN-std-frame
 
-void CAN_handle_message(); //Node 2 needs to do different things depending on what kind of message was received
+int CAN_handle_message(); //Node 2 needs to do different things depending on what kind of message was received, it can return values, look at each case to determine if it will
 
 void CAN_send_parameter(int id, float parameter);	//Node 1 needs to send regulator parameters to node 2 sometimes,
 													//since CAN sends ints we use 2 bytes, and multiply the

@@ -16,9 +16,9 @@ volatile int finished = 0;
 struct input PREV_INPUT;
 struct input LAST_TRANSMITTED_INPUT;
 #define JOYSTICK_MENU_DEADZONE 60
-#define JOYSTICK_TRANSMIT_DEADZONE 7
-#define JOYSTICK_ZERO_DEADZONE 7
-#define SLIDER_TRANSMIT_DEADZONE 2
+#define JOYSTICK_TRANSMIT_DEADZONE 6
+#define JOYSTICK_ZERO_DEADZONE 8
+#define SLIDER_TRANSMIT_DEADZONE 4
 
 uint8_t adc_read(int channel)
 {
@@ -100,6 +100,7 @@ int adc_slider_position_left()
 
 int adc_slider_position_right()
 {
+	
 	return 100*adc_read(4)/((float)255);
 }
 
@@ -124,6 +125,11 @@ void adc_print_inputs()
 
 int adc_update_current_input()
 {
+	//Apply deadzone
+	if (CURRENT_INPUT.joystick.x_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.x_p > -JOYSTICK_ZERO_DEADZONE) CURRENT_INPUT.joystick.x_p = 0;
+	if (CURRENT_INPUT.joystick.y_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.y_p > -JOYSTICK_ZERO_DEADZONE) CURRENT_INPUT.joystick.y_p = 0;
+		
+	
 	//Check if there is a difference
 	int difference = compare_new_input();
 	
@@ -140,12 +146,7 @@ int adc_update_current_input()
 	CURRENT_INPUT.button_l = PINB&(1<<PB1);
 	CURRENT_INPUT.button_r = PINB&(1<<PB2);
 	
-	//Apply deadzone
-	if (CURRENT_INPUT.joystick.x_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.x_p > -JOYSTICK_ZERO_DEADZONE) CURRENT_INPUT.joystick.x_p = 0;
-	if (CURRENT_INPUT.joystick.y_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.y_p > -JOYSTICK_ZERO_DEADZONE) CURRENT_INPUT.joystick.y_p = 0;
-	
 	return difference;
-
 }
 
 int joystick_down()
@@ -170,12 +171,11 @@ int joystick_right()
 
 void send_current_input()
 {
-	struct can_frame message = CAN_frame_init(ID_INPUT_UPDATE,5);
+	struct can_frame message = CAN_frame_init(ID_INPUT_UPDATE,4);
 	message.data[0] = CURRENT_INPUT.joystick.x_p;
 	message.data[1] = CURRENT_INPUT.joystick.x_p;
 	message.data[2] = CURRENT_INPUT.joystick.button;
-	message.data[3] = CURRENT_INPUT.button_l;
-	message.data[4] = CURRENT_INPUT.button_r;
+	message.data[3] = CURRENT_INPUT.slider_l;
 	CAN_send_frame(&message);
 	LAST_TRANSMITTED_INPUT = CURRENT_INPUT;
 }
@@ -184,10 +184,10 @@ int compare_new_input(struct input new_input)
 {
 	int difference = 0;
 	
-	//Compare binary values
+	//Compare binary values, if they are pressed we have to send a message. This is due to how our controls are set up
 	if (PREV_INPUT.button_l != LAST_TRANSMITTED_INPUT.button_l) return 1;
 	if (PREV_INPUT.button_r != LAST_TRANSMITTED_INPUT.button_r) return 10;
-	if (PREV_INPUT.joystick.button != LAST_TRANSMITTED_INPUT.joystick.button) return 100;
+	if (PREV_INPUT.joystick.button) return 100;
 	
 	//Compare sliders
 	if (PREV_INPUT.slider_l > LAST_TRANSMITTED_INPUT.slider_l + SLIDER_TRANSMIT_DEADZONE || PREV_INPUT.slider_l < LAST_TRANSMITTED_INPUT.slider_l - SLIDER_TRANSMIT_DEADZONE) return 200;
@@ -198,13 +198,8 @@ int compare_new_input(struct input new_input)
 	if (PREV_INPUT.joystick.y_p < LAST_TRANSMITTED_INPUT.joystick.y_p - JOYSTICK_TRANSMIT_DEADZONE || PREV_INPUT.joystick.y_p > LAST_TRANSMITTED_INPUT.joystick.y_p + JOYSTICK_TRANSMIT_DEADZONE) return 290;
 	
 	//Snap back to zero
-	if (CURRENT_INPUT.joystick.x_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.x_p > -JOYSTICK_ZERO_DEADZONE) if (LAST_TRANSMITTED_INPUT.joystick.x_p != 0) return 300;
-	if (CURRENT_INPUT.joystick.y_p < JOYSTICK_ZERO_DEADZONE && CURRENT_INPUT.joystick.y_p > -JOYSTICK_ZERO_DEADZONE) if (LAST_TRANSMITTED_INPUT.joystick.y_p != 0) return 301;
+	if (PREV_INPUT.joystick.x_p < JOYSTICK_ZERO_DEADZONE && PREV_INPUT.joystick.x_p > -JOYSTICK_ZERO_DEADZONE) if (LAST_TRANSMITTED_INPUT.joystick.x_p != 0) return 300;
+	if (PREV_INPUT.joystick.y_p < JOYSTICK_ZERO_DEADZONE && PREV_INPUT.joystick.y_p > -JOYSTICK_ZERO_DEADZONE) if (LAST_TRANSMITTED_INPUT.joystick.y_p != 0) return 301;
 	
 	return difference;
 }
-
-
-#define JOYSTICK_TRANSMIT_DEADZONE 7
-#define JOYSTICK_ZERO_DEADZONE 7
-#define SLIDER_TRANSMIT_DEADZONE 2

@@ -1,6 +1,7 @@
 #include "CAN.h"
 #ifdef __AVR_ATmega2560__
 #include "../node 2/node 2/local_drivers/motor_control.h"
+#include "../node 2/node 2/local_drivers/pwm.h"
 #endif
 
 #include "f_cpu.h"
@@ -137,7 +138,7 @@ int message_received_flag()
 	return message_received;
 }
 
-void CAN_handle_message()
+int CAN_handle_message()
 {
 	
 	//Collects the message
@@ -151,7 +152,7 @@ void CAN_handle_message()
 		}
 		
 		#ifdef __AVR_ATmega2560__  //THESE IDS ARE ONLY RELEVANT FOR NODE 2
-		case (ID_INPUT_UPDATE):	//MESSAGE IS CONTROL UPDATE, [x_pos, y_pos, joystick_button, lbutton, rbutton]
+		case (ID_INPUT_UPDATE):	//MESSAGE IS CONTROL UPDATE, [x_pos, y_pos, joystick_button, lslider]
 		{
 			//Sends data right to regulator
 			ctrl_update_ref(message.data[0] / REFERENCE_DIVIDER);
@@ -161,6 +162,8 @@ void CAN_handle_message()
 			if (message.data[2]) ctrl_fire_sol();
 			
 			//Updates servo position
+			pwm_set_duty_ms(1.2*message.data[3]/100.0+0.9);
+			
 			
 			break;
 		}
@@ -181,13 +184,15 @@ void CAN_handle_message()
 			break;
 		}
 		#elif __AVR_ATmega162__ //THESE IDS ARE ONLY RELEVANT FOR NODE 1
-		case (ID_IR_SENSOR_TRIGGERED): //Ball is detected -> game over
+		case (ID_IR_SENSOR_TRIGGERED): //Ball is detected -> game over, then it returns 1
 		{
-			printf("GAME OVER\n");
+			return 1;
 			break;
 		}
 		#endif
 	}
+	
+	return 0;
 	
 }
 

@@ -8,7 +8,6 @@
 volatile uint16_t detection_count = 0;
 
 
-
 void ir_init()
 {
 	adc2560_init();

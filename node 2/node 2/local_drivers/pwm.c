@@ -3,6 +3,7 @@
 #include <avr/io.h>
 
 
+
 int pwm_init()
 {
 
@@ -27,3 +28,4 @@ void pwm_set_duty_ms(float pulse_width)
 	//Changes register value
 	OCR1B = F_CPU/1024/1000 *pulse_width - 1;
 }
+
