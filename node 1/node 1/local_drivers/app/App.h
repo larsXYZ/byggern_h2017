@@ -16,8 +16,9 @@
 #include "menu_object.h"
 
 //CONSTANTS
-#define MAX_SCORE 255*100
-#define SCORE_DIVIDER 100
+#define SCORE_DIVIDER 50
+#define MAX_SCORE 255*SCORE_DIVIDER
+
 #define MAX_DIFFICULTY 2
 
 //GAME VARIABLES
@@ -41,6 +42,9 @@ int app_round_review(); //After a round the player is shown the score and can qu
 void app_show_gamescreen(); //Shows the score on the oled while the game is running
 int app_endscreen(); //Shows score, allows player to restart
 void app_goodbye_message(); //Thanks the player for waiting
+void app_reset_node2(); //Sends reset signal to node 2, used if player wants to restart game
+void app_get_ready_screen(); //Hypes the player, this will be fun!
+void app_update_reference_div(int f); //Updates the reference divider of node 2, changes top speed
 
 /*	Menu - actions	*/
 void opt_select_name(); //selects name 

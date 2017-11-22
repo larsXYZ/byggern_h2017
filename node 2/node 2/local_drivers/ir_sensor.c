@@ -5,7 +5,7 @@
 
 #define VOLTAGE_THRESHOLD 25 //[0-1023]
 #define IR_PIN 0 //ADC
-#define DETECTION_LIMIT 10 //If ball is detected 10 times in a row, send game over signal. Filters noise
+#define DETECTION_LIMIT 5 //If ball is detected 10 times in a row, send game over signal. Filters noise
 
 volatile uint16_t detection_count = 0;
 
@@ -25,7 +25,11 @@ int ir_detect_ball()
 		detection_count++;
 		
 		//If we have enough detections the ball is detected
-		if (detection_count > DETECTION_LIMIT) return 1;
+		if (detection_count > DETECTION_LIMIT)
+		{
+			detection_count = 0;
+			return 1;
+		}
 	}
 	else
 	{

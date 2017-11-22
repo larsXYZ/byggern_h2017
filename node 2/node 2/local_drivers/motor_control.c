@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 //See .h file for function explanations
-
 //PIN DEFINITIONS
 #define EN PH4
 #define RST_ PH6
@@ -17,8 +16,9 @@
 #define SOL_PIN PA0
 
 //Regulator tuning
-float KP = 7.5;
-float KI = 0.4;
+float KP = 1;
+float KI = 1;
+float reference_divider; //Value received over CAN controller is too large for our motor, we need to scale it down
 
 void ctrl_init()
 {
@@ -86,7 +86,6 @@ int16_t ctrl_read_encoder()
 void ctrl_regulate()
 {	
 	
-	
 	//Measure velocity
 	curr_vel = ctrl_read_encoder();
 	
@@ -146,3 +145,18 @@ void ctrl_fire_sol()
 void ctrl_update_KP(float p){ KP = p; }
 
 void ctrl_update_KI(float p){ KI = p; }
+
+void ctr_reset_integral()
+{
+	error_sum = 0;
+}
+
+void ctrl_update_reference_div(float f)
+{
+	reference_divider = f;
+}
+
+float ctrl_get_reference_div()
+{
+	return reference_divider;
+}

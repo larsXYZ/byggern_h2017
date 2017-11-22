@@ -140,6 +140,8 @@ int message_received_flag()
 	return message_received;
 }
 
+
+
 int CAN_handle_message()
 {
 	
@@ -165,6 +167,7 @@ int CAN_handle_message()
 			//Updates servo position
 			pwm_set_duty_ms(1.2*message.data[3]/100.0+0.9);
 			
+			printf("UPDATED CONTROLS r: %d\n", ref_vel);
 			
 			break;
 		}
@@ -173,6 +176,8 @@ int CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
+			printf("PARAMETER CHANGED\n");
+			ctr_reset_integral();
 			break;
 		}
 		case (ID_REGULATOR_KI): //MESSAGE IS UPDATE TO KP PARAMETER, //Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
@@ -180,6 +185,20 @@ int CAN_handle_message()
 			uint16_t data = (message.data[0] << 8);
 			data |= (message.data[1]);
 			ctrl_update_KP(data / 1000.0);
+			printf("PARAMETER CHANGED\n");
+			ctr_reset_integral();
+			break;
+		}
+		case (ID_RESTART): //Node 2 restarts, length doesnt matter
+		{
+			ctr_reset_integral();
+			printf("RESTART\n");
+			return 1;
+		}
+		case (ID_UPDATE_REFERENCE_DIV): //Node 2 changes reference divider, which impacts top speed of motor, length = 1, first byte is value of new reference div
+		{
+			ctrl_update_reference_div(message.data[0]);
+			printf("UPDATE REF\n");
 			break;
 		}
 		#elif __AVR_ATmega162__ //THESE IDS ARE ONLY RELEVANT FOR NODE 1

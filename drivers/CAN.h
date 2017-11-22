@@ -20,6 +20,8 @@
 #define ID_REGULATOR_KP 2	//Should be message of length 2 with the KP parameter, 1 -> higher bits, 2 -> lower bits
 #define ID_REGULATOR_KI 3	//Should be message of length 2 with the KI parameter, 1 -> higher bits, 2 -> lower bits
 #define ID_IR_SENSOR_TRIGGERED 1 //Node 1 knows that the ball is detected and the game is over
+#define ID_RESTART 5 //Node 2 restarts when this ID is detected
+#define ID_UPDATE_REFERENCE_DIV 6 //The reference divider changes the top speed of the motor controller
 
 
 struct can_frame

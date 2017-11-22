@@ -41,15 +41,18 @@ void game_loop()
 {
 	while (1)
 	{
+
 		//Listen for messages from node 1
 		CAN_handle_message();
 		
 		//Check if ball is detected, if it is -> notify node 1
 		if (ir_detect_ball())
 		{
-			while (1)
+			game_ball_detected(); //Sends message to node 1
+			while(!CAN_handle_message()) 
 			{
-				game_ball_detected(); //Sends message to node 1
+				//Waits for reset signal from node 1
+				ctr_reset_integral();
 			}
 		}
 	}

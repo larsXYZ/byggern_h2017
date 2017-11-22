@@ -14,7 +14,7 @@ int main(void)
 	while (1)
 	{
 		if(app_main_menu()) break; //Main menu before game start
-		//app_run();	//Runs the game/application
+		app_run();	//Runs the game/application
 		if (app_round_review()) break;
 	}
 	app_goodbye_message();

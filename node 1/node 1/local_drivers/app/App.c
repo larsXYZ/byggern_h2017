@@ -29,17 +29,17 @@ struct option end_game;
 
 //Tuning level:
 int CURRENT_TUNING = 0;
-char TUNING_NAME[3][5] = {"NORM","FAST","SLOW"};
+char TUNING_NAME[3][5] = {"NORM","FAST","ICE "};
 
 /*   Player name   */
 char PLAYER_NAME[] = "AAA";
 
 //Available songs:
-int CURRENT_SONG = 0;  
+int CURRENT_SONG = 2;  
 
 //Highscore: 
-int HIGHSCORE_LIST[10] = {123, 92, 62, 54, 40, 3, 0, 0, 0, 0}; 
-char HIGHSCORE_LIST_NAMES[10][4] = {"LAR","PER","XXX","AKS","HEN","CHR","   ","   ","   ","   "};
+int HIGHSCORE_LIST[10] = {123, 92, 62, 54, 40, 3}; 
+char HIGHSCORE_LIST_NAMES[10][4] = {"LAR","PER","XXX","AKS","HEN","CHR",};
 
 int EXIT_APPLICATION = 0;
 
@@ -60,6 +60,9 @@ void app_init()
 	//Shows logo
 	music_start_up_sound();
 	app_logo();
+	
+	//Resets node 2
+	app_reset_node2();
 	
 	//Creating menus
 	menu_constr(&setup_menu, "Settings");
@@ -89,6 +92,9 @@ void app_init()
 	
 	//Enable interrupts
 	sei();
+	
+	//Calibrate joystick
+	adc_joy_calibrate();
 }
 
 void app_setup()
@@ -121,6 +127,9 @@ int app_main_menu()
 	}
 	else
 	{
+		
+		app_get_ready_screen();
+		
 		NEXT_MENU = 0;
 		return 0;
 	}
@@ -130,6 +139,8 @@ int app_main_menu()
 	
 void app_run()
 {
+	NEXT_MENU = 0;
+	
 	
 	//Game loop
 	while (1)
@@ -137,15 +148,15 @@ void app_run()
 		
 		//Update input, if the change from the last transmitted value is large enough we transmit the new values
 		if(adc_update_current_input() != 0) send_current_input();
-		
-		//Show game screen
-		app_show_gamescreen();
-		
+
 		//Handle input, checks for game over
 		if (CAN_handle_message()) return;
 		
 		//Update score
-		if (CURRENT_SCORE < MAX_SCORE) CURRENT_SCORE++;
+		if (CURRENT_SCORE < MAX_SCORE)
+		{
+			CURRENT_SCORE++;
+			if (CURRENT_SCORE % SCORE_DIVIDER == 0) app_show_gamescreen(); //Update screen
 
 	}
 	
@@ -271,6 +282,7 @@ int app_round_review()
 	{
 		oled_clear_SRAM();
 		oled_update_from_SRAM();
+		app_reset_node2();
 		menu_print(&main_menu);
 		return 0;
 	}
@@ -290,13 +302,13 @@ void update_highscore()
 	
 	//Finds your spot on the list
 	int i = 0;
-	while (CURRENT_SCORE/SCORE_DIVIDER < HIGHSCORE_LIST[i] && i < 10)	i++;
+	while (CURRENT_SCORE/SCORE_DIVIDER < HIGHSCORE_LIST[i] && i < 6)	i++;
 
 	//Check if you are off the list
-	if (i > 9) return;
+	if (i > 5) return;
 	
 	//Put score on highscore list and move all other down
-	for (int q = 9;q > i; q--)
+	for (int q = 5; q > i; q--)
 	{
 		HIGHSCORE_LIST[q] = HIGHSCORE_LIST[q-1];
 		for (int t = 0; t < 4; t++) HIGHSCORE_LIST_NAMES[q][t] = HIGHSCORE_LIST_NAMES[q-1][t];
@@ -304,6 +316,42 @@ void update_highscore()
 	HIGHSCORE_LIST[i] = CURRENT_SCORE/SCORE_DIVIDER;
 	for (int t = 0; t < 4; t++) HIGHSCORE_LIST_NAMES[i][t] = PLAYER_NAME[t];
 }
+
+void app_reset_node2()
+{
+	struct can_frame message = CAN_frame_init(ID_RESTART,1);
+	CAN_send_frame(&message);
+}
+
+void app_get_ready_screen()
+{
+	
+	//Counts down on screen
+	oled_clear_SRAM();
+	oled_go_to(30,4);
+	oled_cstring_write("3 ..",0);
+	oled_update_from_SRAM();
+	_delay_ms(1000);
+	oled_cstring_write("2 ..",1);
+	oled_update_from_SRAM();
+	_delay_ms(1000);
+	oled_cstring_write("1 ..",1);
+	oled_update_from_SRAM();
+	_delay_ms(1000);
+	oled_cstring_write("GO!",2);
+	oled_update_from_SRAM();
+	_delay_ms(1000);
+}
+
+void app_update_reference_div(int new_value)
+{
+	struct can_frame message = CAN_frame_init(ID_RESTART,1);
+	message.data[0] = new_value;
+	CAN_send_frame(&message);
+}
+
+
+
 
 
 

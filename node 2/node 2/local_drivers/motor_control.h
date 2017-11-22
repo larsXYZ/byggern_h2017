@@ -20,7 +20,6 @@ volatile int16_t curr_error;	//Current error
 
 //Settings
 #define CONTROLLER_DT 0.05	//Timestep of controller [s], should be below 260 ms at the moment and above ~10(?) ms
-#define REFERENCE_DIVIDER 5.0 //Value received over CAN controller is too large for our motor, we need to scale it down
 
 //Functions
 void ctrl_init();			//Sets up the necessary registers for operation
@@ -31,5 +30,8 @@ void ctrl_reset();			//Resets the reference value and error sum
 void ctrl_fire_sol();		//Fires the soleinoid
 void ctrl_update_KP(float p); //Updates the regulator KP value
 void ctrl_update_KI(float p); //Updates the regulator KI value
+void ctr_reset_integral(); //Resets integral effect
+void ctrl_update_reference_div();
+float ctrl_get_reference_div();
 
 #endif

@@ -49,10 +49,8 @@ void opt_select_name()
 		{
 			
 			_delay_ms(100);
-			
 			oled_go_to(60+(8*i),3);
 			oled_cstring_write("_",2);
-		
 			oled_update_from_SRAM();
 		}
 		
@@ -105,22 +103,25 @@ void opt_select_tuning()
 		//Send parameters to Node 2
 		switch (CURRENT_TUNING)
 		{
-			case (0):
+			case (0): //Norm
 			{
-				CAN_send_parameter(ID_REGULATOR_KP, 7.5);
-				CAN_send_parameter(ID_REGULATOR_KI, 0.4);
+				CAN_send_parameter(ID_REGULATOR_KP, 9.0);
+				CAN_send_parameter(ID_REGULATOR_KI, 0.385);
+				app_update_reference_div(16);
 				break;
 			}
-			case (1):
+			case (1): //Fast
+			{
+				CAN_send_parameter(ID_REGULATOR_KP, 9.5);
+				CAN_send_parameter(ID_REGULATOR_KI, 0.5);
+				app_update_reference_div(14);
+				break;
+			}
+			case (2): //Ice
 			{
 				CAN_send_parameter(ID_REGULATOR_KP, 3.5);
 				CAN_send_parameter(ID_REGULATOR_KI, 0.3);
-				break;
-			}
-			case (2):
-			{
-				CAN_send_parameter(ID_REGULATOR_KP, 9);
-				CAN_send_parameter(ID_REGULATOR_KI, 0.6);
+				app_update_reference_div(15);
 				break;
 			}
 			

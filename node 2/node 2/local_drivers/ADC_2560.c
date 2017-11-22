@@ -35,7 +35,7 @@ uint16_t adc2560_read_bin(int ch)
 
 float adc2560_read_v(int ch)
 {
-		//Select Channel
+	//Select Channel
 	ADMUX |= (0x1F & ch);
 	
 	//Start conversion
